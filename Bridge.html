@@ -1,0 +1,47 @@
+<html><head><title>Bridge-桥接模式</title><meta charset="utf-8"></head>
+<body>
+  <script type="text/javascript">
+  var MyNamespace = window.MyNamespace || {};
+  // 定义在request模块 
+  MyNamespace.request = (function(){
+    function getXHR(){
+      methods = [
+        function(){ return new XMLHttpRequest(); },
+        function(){ return new ActiveXObject('Microsoft.XMLHTTP'); },
+        function(){ return new ActiveXObject('Msxml2.XMLHTTP'); }
+      ]
+      for(var i = 0; i < methods.length; i++){
+        try{
+          methods[i]();
+        }catch(e){
+          continue;
+        }
+        this.getXHR = methods[i]();
+        return methods[i]();
+      } 
+    }
+    function handleReadystate(xhr, callback){
+      xhr.onreadystatechange = function(){
+        if(xhr.readyState == 4 && xhr.status == 200){
+          if(callback){
+            callback(xhr.responseText);
+          }
+        }
+      }
+
+    } 
+    return function(method, uri, postData, callback){
+      //此处运用了桥接模式
+      var xhr = getXHR();
+      xhr.open(method, uri, true);
+      handleReadystate(xhr, callback);
+      xhr.send(postData || null);
+    }
+  })();
+
+  MyNamespace.request('post', 'test.php', "name=test&pwd=test", function(data){
+    alert(data);
+  })
+  </script>
+</body>
+</html>

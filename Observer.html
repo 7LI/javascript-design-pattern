@@ -1,0 +1,62 @@
+<html><head><title>Observer-观察者模式</title><meta charset="utf-8"></head>
+<body>
+  <script type="text/javascript">
+  var MyNamespace = window.MyNamespace || {};
+  // 定义在sample模块 
+  MyNamespace.sample = (function(){
+    function Publisher(){
+      this.subscribers = [];
+    }
+    Publisher.prototype = {
+      publish: function(msg){
+        for(var i in this.subscribers){
+          this.subscribers[i].msg = msg;
+        }
+        alert('Publish:"'+msg+'"');
+      }
+    }
+    function Subscriber(name){
+      this.name = name;
+      this.msg;
+    }
+    Subscriber.prototype = {
+      subscribe: function(publisher){
+        for(var i in publisher.subscribers){
+          if(publisher.subscribers[i] == this){
+            return;
+          }
+        }
+        publisher.subscribers.push(this);
+      },
+      getMsg: function(){
+        alert(this.name + ' has receive:"' + this.msg + '"');
+      }
+    }
+    return {
+      Publisher:Publisher,
+      Subscriber:Subscriber
+    }
+  })();
+
+  var p = new MyNamespace.sample.Publisher();
+  var s1 = new MyNamespace.sample.Subscriber('s1');
+  var s2 = new MyNamespace.sample.Subscriber('s2');
+  var s3 = new MyNamespace.sample.Subscriber('s3');
+
+  s1.subscribe(p);
+  s2.subscribe(p);
+  s3.subscribe(p);
+
+  p.publish('new report');
+  s1.getMsg();
+  s2.getMsg();
+  s3.getMsg();
+
+  p.publish('another report')
+  s1.getMsg();
+  s2.getMsg();
+  s3.getMsg();
+
+  </script>
+</body>
+</html>

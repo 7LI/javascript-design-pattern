@@ -1,0 +1,230 @@
+<html><head><title>Flyweight-享元模式</title><meta charset="utf-8"></head>
+<body>
+  <style type="text/css">
+    .month{width: 200px;height:150px;padding:10px;border: 1px solid green; float: left;margin-right: 5px;margin-bottom: 5px;}
+    .day{width: 15px;border: 1px solid green;float: left;margin-right: 5px;margin-bottom: 5px;padding: 2px;text-align: center;}
+  </style>
+  <script type="text/javascript">
+  var MyNamespace = window.MyNamespace || {};
+  // 定义在calendar模块
+  MyNamespace.calendar = (function(){
+    function Day(){}
+    Day.prototype = {
+      getDom: function(num){
+        var element = document.createElement('div');
+        element.className = 'day';
+        var text = document.createTextNode(num);
+        element.appendChild(text);
+        return element;
+      }
+    }
+    var flyWeightDay = new Day();
+    function Year(year, parent) {
+      this.element;
+      this.parent = parent;
+      this.isLeapYear = !(year%400) || (!(year%4) && (year%100));
+      this.months = [];
+      for(var i = 0; i < 12; i++){
+        this.months.push(new Month(i, this.isLeapYear));
+      }
+
+      this.buildDom();
+    }
+    Year.prototype = {
+      buildDom: function(parent){
+        this.element = document.createElement('div');
+        this.element.className = 'year';
+        for(var i = 0; i < this.months.length; i++){
+          var month = this.months[i];
+          month.buildDom();
+          this.element.appendChild(month.getDom());
+        }
+        this.parent.appendChild(this.element);
+      }
+
+    }
+    function Month(month, isLeapYear){
+      this.days = [];
+      this.element;
+      this.numDay;
+      switch(month){
+        case 0:
+          this.numDay = 31;
+          break;
+        case 1:
+          this.numDay = isLeapYear?29:28;
+          break;
+        case 2:
+          this.numDay = 31;
+          break;
+        case 3:
+          this.numDay = 30;
+          break;
+        case 4:
+          this.numDay = 31;
+          break;
+        case 5:
+          this.numDay = 30;
+          break;
+        case 6:
+          this.numDay = 31;
+          break;
+        case 7:
+          this.numDay = 31;
+          break;
+        case 8:
+          this.numDay = 30;
+          break;
+        case 9:
+          this.numDay = 31;
+          break;
+        case 10:
+          numDay = 30;
+          break;
+        case 11:
+          this.numDay = 31;
+          break;
+      }     
+    }
+    Month.prototype = {
+      buildDom: function(){
+        this.element = document.createElement('div');
+        this.element.className = 'month';
+        for(var i = 0;  i < this.numDay; i++){
+          this.element.appendChild(flyWeightDay.getDom(i+1));
+        }
+      },
+      getDom: function(){
+        return this.element;
+      }
+    }
+    
+    return {
+      Year:Year
+    }
+  })();
+
+  window.onload = function(){
+    var body = document.getElementsByTagName('body')[0];
+    new MyNamespace.calendar.Year(2004, body);
+  }
+
+  /******************************************************
+   * 非享元版：使用了几百个Day对象，占用内存很大
+   ***************************************/
+
+  // var MyNamespace = window.MyNamespace || {};
+  // // 定义在calendar模块
+  // MyNamespace.calendar = (function(){
+  //  function Year(year, parent) {
+  //    this.element;
+  //    this.parent = parent;
+  //    this.isLeapYear = !(year%400) || (!(year%4) && (year%100));
+  //    this.months = [];
+  //    for(var i = 0; i < 12; i++){
+  //      this.months.push(new Month(i, this.isLeapYear));
+  //    }
+
+  //    this.buildDom();
+  //  }
+  //  Year.prototype = {
+  //    buildDom: function(parent){
+  //      this.element = document.createElement('div');
+  //      this.element.className = 'year';
+  //      for(var i = 0; i < this.months.length; i++){
+  //        var month = this.months[i];
+  //        month.buildDom();
+  //        this.element.appendChild(month.getDom());
+  //      }
+  //      this.parent.appendChild(this.element);
+  //    }
+
+  //  }
+  //  function Month(month, isLeapYear){
+  //    this.days = [];
+  //    this.element;
+  //    var numDay;
+  //    switch(month){
+  //      case 0:
+  //        numDay = 31;
+  //        break;
+  //      case 1:
+  //        numDay = isLeapYear?29:28;
+  //        break;
+  //      case 2:
+  //        numDay = 31;
+  //        break;
+  //      case 3:
+  //        numDay = 30;
+  //        break;
+  //      case 4:
+  //        numDay = 31;
+  //        break;
+  //      case 5:
+  //        numDay = 30;
+  //        break;
+  //      case 6:
+  //        numDay = 31;
+  //        break;
+  //      case 7:
+  //        numDay = 31;
+  //        break;
+  //      case 8:
+  //        numDay = 30;
+  //        break;
+  //      case 9:
+  //        numDay = 31;
+  //        break;
+  //      case 10:
+  //        numDay = 30;
+  //        break;
+  //      case 11:
+  //        numDay = 31;
+  //        break;
+  //    }
+  //    for(var i = 1; i <= numDay; i++){
+  //      this.days.push(new Day(i));
+  //    }
+      
+  //  }
+  //  Month.prototype = {
+  //    buildDom: function(){
+  //      this.element = document.createElement('div');
+  //      this.element.className = 'month';
+  //      for(var i = 0;  i < this.days.length; i++){
+  //        var day = this.days[i];
+  //        day.buildDom();
+  //        this.element.appendChild(day.getDom());
+  //      }
+  //    },
+  //    getDom: function(){
+  //      return this.element;
+  //    }
+  //  }
+  //  function Day(num){
+  //    this.num = num;
+  //    this.element;
+  //  }
+  //  Day.prototype = {
+  //    buildDom: function(){
+  //      this.element = document.createElement('div');
+  //      this.element.className = 'day';
+  //      var text = document.createTextNode(this.num);
+  //      this.element.appendChild(text);
+  //    },
+  //    getDom: function(){
+  //      return this.element;
+  //    }
+  //  }
+  //  return {
+  //    Year:Year
+  //  }
+  // })();
+
+  // window.onload = function(){
+  //  var body = document.getElementsByTagName('body')[0];
+  //  new MyNamespace.calendar.Year(2004, body);
+  // }
+  </script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<html><head><title>Command-命令模式</title><meta charset="utf-8"></head>
+<body>
+  <style type="text/css">
+  .memu{}
+  .menu-item{padding: 5px 10px; background: green;width: 100px;cursor: pointer;margin-bottom: 1px;}
+  </style>
+  <script type="text/javascript">
+  var MyNamespace = window.MyNamespace || {};
+  // 定义在composite模块 
+  MyNamespace.composite = (function(){
+    function Menu(parent){
+      this.parent = parent;
+      this.element = document.createElement('div');
+      this.element.className = 'menu';
+      this.parent.appendChild(this.element);
+    }
+    Menu.prototype = {
+      add: function(menuItem){
+        this.element.appendChild(menuItem.element);
+      }
+    }
+    function MenuItem(name, command){
+      this.element = document.createElement('div');
+      this.element.className = 'menu-item';
+      var itemName = document.createTextNode(name)
+      this.element.appendChild(itemName);
+      this.command = command;
+      this._addAction();
+    }
+    MenuItem.prototype = {
+      _addAction: function(){
+        var that = this;
+        this.element.onclick = function(){
+          that.command.run();
+        }
+      }
+    }
+    function Command(name){
+      this.name = name;
+    }
+    Command.prototype = {
+      run: function(){
+        alert(this.name);
+      }
+    }
+    return {
+      Menu: Menu,
+      MenuItem: MenuItem,
+      Command: Command
+    }
+  })();
+
+  window.onload = function(){
+    var body = document.getElementsByTagName('body')[0];
+    var menu = new MyNamespace.composite.Menu(body);
+    var editCommand = new MyNamespace.composite.Command('edit');
+    var saveCommand = new MyNamespace.composite.Command('save');
+    var menuItem = new MyNamespace.composite.MenuItem('选项一', editCommand);
+    var menuItem1 = new MyNamespace.composite.MenuItem('选项二', saveCommand);
+    menu.add(menuItem);
+    menu.add(menuItem1);
+  }
+
+  </script>
+</body>
+</html>

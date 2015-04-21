@@ -1,0 +1,97 @@
+<html><head><title>Composite-组合模式</title><meta charset="utf-8"></head>
+<body>
+  <script type="text/javascript">
+  var MyNamespace = window.MyNamespace || {};
+  // 定义在form模块
+  MyNamespace.form = (function(){
+    function Form(id, method, action){
+      this.element = document.createElement('form');
+      this.element.id = id;
+      this.element.method = method;
+      this.element.action = action;
+      this.store = [];
+    }
+    Form.prototype = {
+      add: function(fieldset){
+        this.element.appendChild(fieldset.getDom());
+        this.store.push(fieldset);
+      },
+      getDom: function(){
+        return this.element;
+      }
+    }
+    function Field(id){
+      this.element = document.createElement('fieldset');
+      this.element.id = id;
+      this.store = [];
+    }
+    Field.prototype = {
+      add: function(input){
+        this.element.appendChild(input.getDom());
+        this.store.push(input);
+      },
+      getDom: function(){
+        return this.element;
+      }
+    }
+    function Input(id, type, label){
+      this.wrapper =  document.createElement('div');
+
+      var labelTextNode = document.createTextNode(label);
+      this.label = document.createElement('label');
+      this.label.appendChild(labelTextNode);
+      this.wrapper.appendChild(this.label);
+    
+      this.element = document.createElement(type);
+      this.element.id = id;
+      this.wrapper.appendChild(this.element);
+    }
+    Input.prototype = {
+      getDom: function(){
+        return this.wrapper;
+      }
+    }
+    return{
+      Form:Form,
+      Field:Field,
+      Input:Input
+    }
+  })();
+  window.onload = function(){
+      var form = new MyNamespace.form.Form('myForm', 'post', 'test.php');
+      var fields = [
+        new MyNamespace.form.Field('field1'),
+        new MyNamespace.form.Field('field2'),
+        new MyNamespace.form.Field('field3')
+      ];
+      var inputs = [
+        [
+          new MyNamespace.form.Input('input1', 'input', 'input1:'),
+          new MyNamespace.form.Input('input2', 'textarea', 'input2:'),
+          new MyNamespace.form.Input('input3', 'input', 'input3:')
+        ],
+        [
+          new MyNamespace.form.Input('input4', 'textarea', 'input4:'),
+          new MyNamespace.form.Input('input5', 'input', 'input5:'),
+          new MyNamespace.form.Input('input6', 'input', 'input6:')
+        ],
+        [
+          new MyNamespace.form.Input('input7', 'input', 'input7:'),
+          new MyNamespace.form.Input('input8', 'input', 'input8:'),
+          new MyNamespace.form.Input('input9', 'textarea', 'input9:')
+        ]
+
+      ]
+      for(var i = 0; i < fields.length; i++){
+        form.add(fields[i]);
+        for(var j = 0; j < inputs.length; j++){
+          fields[i].add(inputs[i][j]);
+        }
+      }
+      
+      document.getElementsByTagName('body')[0].appendChild(form.getDom());
+  }
+
+  </script>
+</body>
+</html>

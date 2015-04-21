@@ -1,0 +1,54 @@
+<html><head><title>Decorator-装饰者模式</title><meta charset="utf-8"></head>
+<body>
+  <script type="text/javascript">
+  var MyNamespace = window.MyNamespace || {};
+  // 定义在sample模块
+  MyNamespace.sample = (function(){
+    function buildDom(){}
+    buildDom.prototype = {
+      startBuilt: function(){
+        var body = document.getElementsByTagName('body')[0];
+        for(var i = 0; i < 100; i++){
+          var list = document.createElement('ul');
+          for(var j = 0; j < 100; j++){
+            var item = document.createElement('li');
+            var text = document.createTextNode('test');
+            item.appendChild(text);
+            list.appendChild(item);
+          }
+          body.appendChild(list);
+        }
+      }
+    }
+    function timeDetector(buildDom){
+      this.buildDom = buildDom;
+      this.startTime;
+    }
+    timeDetector.prototype = {
+      startRun: function(){
+        this.startTime = (new Date()).getTime();
+      },
+      stopRun: function(){
+        var runTime = (new Date()).getTime() - this.startTime;
+        console.log("running cost:" + runTime + 'ms');
+      },
+      startBuilt: function(){
+        this.startRun();
+        this.buildDom.startBuilt();
+        this.stopRun();
+      }
+    }
+    return {
+      buildDom: buildDom,
+      timeDetector: timeDetector
+    }
+  })()
+
+  window.onload = function(){
+    var buildDom = new MyNamespace.sample.buildDom();
+    var buildDom = new MyNamespace.sample.timeDetector(buildDom);
+    buildDom.startBuilt();
+  }
+  </script>
+</body>
+</html>

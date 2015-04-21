@@ -1,0 +1,33 @@
+<html><head><title>Adapter-适配器模式</title><meta charset="utf-8"></head>
+<body>
+  <script type="text/javascript">
+  var MyNamespace = window.MyNamespace || {};
+  // 定义在sample模块
+  MyNamespace.sample = (function(){
+    return {
+      aFunctin: function(arg1, arg2, arg3){
+        alert(arg1);
+        alert(arg2);
+        alert(arg3);
+      },
+      adapter: function(obj){
+        var i = 0;
+        var args = [];
+        for(var prop in obj){
+          if(!obj.hasOwnProperty(prop)) continue;
+          args[i++] = obj[prop];
+        }
+        this.aFunctin(args[0], args[1], args[2]);
+      }
+    }
+  })();
+
+  // MyNamespace.sample.aFunctin('a', 'b', 'c');
+  MyNamespace.sample.adapter({
+    'arg1':'a',
+    'arg2':'b',
+    'arg3':'c'
+  })
+  </script>
+</body>
+</html>

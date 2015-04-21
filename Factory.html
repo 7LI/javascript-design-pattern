@@ -1,0 +1,30 @@
+<html><head><title>Factory-工厂模式</title><meta charset="utf-8"></head>
+<body>
+  <script type="text/javascript">
+  var MyNamespace = window.MyNamespace || {};
+  // 定义在xhr模块 ,xhr其实就是一个工厂，生产函数是getXHR
+  MyNamespace.xhr = (function(){
+    return {
+      getXHR:function(){
+        methods = [
+          function(){ return new XMLHttpRequest(); },
+          function(){ return new ActiveXObject('Microsoft.XMLHTTP'); },
+          function(){ return new ActiveXObject('Msxml2.XMLHTTP'); }
+        ]
+        for(var i = 0; i < methods.length; i++){
+          try{
+            methods[i]();
+          }catch(e){
+            continue;
+          }
+          this.getXHR = methods[i]();
+          return methods[i]();
+        } 
+      }
+    }
+  })();
+
+  alert(MyNamespace.xhr.getXHR());
+  </script>
+</body>
+</html>

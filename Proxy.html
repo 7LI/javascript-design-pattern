@@ -1,0 +1,164 @@
+<html><head><title>Proxy-代理模式</title><meta charset="utf-8"></head>
+<body>
+  <style type="text/css">
+    body{padding: :0;margin:0;overflow: hidden;font-family: "微软雅黑"}
+    #modal-dialog{border: 3px solid green;padding: 10px;}
+    #modal-close{position: absolute;top: -20px;right: -18px;cursor: pointer;border: 2px solid green;padding: 1px;border-radius:50% 50%;width: 15px;height: 15px;text-align: center;line-height: 12px;color: green;font-weight: bold;}
+    #modal-loading{text-align: center;}
+  </style>
+
+  <script type="text/javascript">
+  var MyNamespace = window.MyNamespace || {};
+  // 定义在component模块
+  MyNamespace.component = (function(){
+    function Modal(option){
+    }
+    Modal.prototype = {
+      _addListener: function(){
+        var that = this;
+        window.onresize =  function(){
+          that._resizeMask();
+          that._repositionDialog();
+        }
+        this.closeBtn.onclick = function(){
+          that.mask.parentNode.removeChild(that.mask);
+          that.dialog.parentNode.removeChild(that.dialog);
+        }
+      },
+      _resizeMask: function(){
+        this.mask.style.width = '100%';
+        this.mask.style.height = document.body.clientHeight;
+      },
+      _repositionDialog: function(){
+        this.dialog.style.left = (document.body.clientWidth-this.dialog.offsetWidth)/2;
+        this.dialog.style.top = (document.body.clientHeight-this.dialog.offsetHeight)/3;
+      },
+      show: function(){
+        var body = document.getElementsByTagName('body')[0];
+        //mask
+        this.mask = document.createElement('div');
+        this.mask.id = 'modal-mask';
+        this.mask.style.position = 'absolute';
+        this.mask.style.left = 0;
+        this.mask.style.top = 0;
+        this.mask.style.background = '#000';
+        this.mask.style.opacity = '0.5';
+        this.mask.style.filter = 'alpha(opacity=50)';
+        this._resizeMask();
+        body.appendChild(this.mask);
+        //diaglog
+        this.dialog = document.createElement('div');
+        this.dialog.innerHTML = 'HELLO MODAL!';
+        this.dialog.id = 'modal-dialog';
+        this.dialog.style.position = 'absolute';
+        //close-button
+        this.closeBtn = document.createElement('div');
+        var closeText = document.createTextNode('x');
+        this.closeBtn.id = 'modal-close';  
+        this.closeBtn.appendChild(closeText);
+        this.dialog.appendChild(this.closeBtn);
+
+        body.appendChild(this.dialog);
+        this._repositionDialog();
+
+        this._addListener();
+      }
+    }
+    function ModalProxy(){
+      this.interval = null;
+      this.modal = new Modal();
+      this._initialize();
+    }
+    ModalProxy.prototype = {
+      _removeLoading: function(){
+        this.mask.parentNode.removeChild(this.mask);
+        this.loading.parentNode.removeChild(this.loading);
+      },
+      _resizeMask: function(){
+        this.mask.style.width = '100%';
+        this.mask.style.height = document.body.clientHeight;
+      },
+      _repositionLoading: function(){
+        this.loading.style.left = (document.body.clientWidth-this.loading.offsetWidth)/2;
+        this.loading.style.top = (document.body.clientHeight-this.loading.offsetHeight)/3;
+      },
+      _initialize: function(){
+        var that = this;
+        var body = document.getElementsByTagName('body')[0];
+        //mask
+        this.mask = document.createElement('div');
+        this.mask.id = 'modal-loading-mask';
+        this.mask.style.position = 'absolute';
+        this.mask.style.left = 0;
+        this.mask.style.top = 0;
+        this.mask.style.background = '#000';
+        this.mask.style.opacity = '0.5';
+        this.mask.style.filter = 'alpha(opacity=50)';
+        this._resizeMask();
+        this.num = 0;
+        body.appendChild(this.mask);
+        //loading text
+        this.loading = document.createElement('div');
+        this.loading.innerHTML = 'loading...';
+        this.loading.id = 'modal-loading';
+        this.loading.style.position = 'absolute';
+
+        body.appendChild(this.loading);
+        this._repositionLoading();
+        window.onresize =  function(){
+          that._resizeMask();
+          that._repositionLoading();
+        }
+
+        this.interval = setTimeout(function(){
+          that._checkInitailization();
+        }, 100);
+      },
+      _checkInitailization: function(callback){
+        var that = this;
+        this.num++;
+        //这里用num++ 来模拟等待数据处理的过程. this.num > 20为loading停止条件
+        if(this.num > 20){
+          clearTimeout(this.interval);
+          this._removeLoading();
+          callback();
+        }else{
+          document.title =  this.num;
+          this.interval = setTimeout(function(){
+            that._checkInitailization(callback)
+          }, 100);          
+        }
+      },
+      show: function(){
+        var that = this;
+        this._checkInitailization(function(){
+          that.modal.show();
+
+        }); 
+      }
+    }
+    return {
+      ModalProxy:ModalProxy
+    }
+  })();
+
+  window.onload = function(){
+    var mp = new MyNamespace.component.ModalProxy();
+
+    mp.show();
+
+  }
+  </script>
+
+
+  1. Singleton - 单例模式<br/>
+  2. Factory   - 工厂模式<br/>
+  3. Bridge    - 桥接模式<br/>
+  4. Composite - 组合模式<br/>
+  5. Facade  - 门面模式<br/>
+  6. Adapter   - 适配器模式<br/>
+  7. Decorator - 装饰者模式<br/>
+  8. Flyweight - 享元模式<br/>
+  9. Proxy   - 代理模式<br/>
+</body>
+</html>

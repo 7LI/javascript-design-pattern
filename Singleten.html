@@ -1,0 +1,17 @@
+<html><head><title>Singleten-单例模式</title><meta charset="utf-8"></head>
+<body>
+  <script type="text/javascript">
+  var MyNamespace = window.MyNamespace || {};
+  // 定义在singleten模块
+  MyNamespace.singleten = (function(){
+    var appid =  'helloJs';
+    return {
+      getAppId:function(){
+        return appid;
+      }
+    };
+  })();
+  console.log(MyNamespace.singleten.getAppId());
+  </script>
+</body>
+</html>
